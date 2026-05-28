@@ -24,7 +24,7 @@ body{font-family:var(--fn);background:var(--cr);color:var(--g);min-height:100vh;
 .ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .ct{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--az);}
 .bx{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;}
-.bg{background:#E8F5E9;color:#2E7D32;}.ba{background:#FFF3E0;color:#D4820A;}.br{background:#FDECEA;color:#C0392B;}.bb{background:#EEF2F8;color:#324569;}.bz{background:rgba(44,44,44,.08);color:#4A4A4A;}.bv{background:#F3EEF8;color:#56336D;}
+.bg{background:#E8F5E9;color:#2E7D32;}.ba{background:#FFF3E0;color:#D4820A;}.br{background:#FDECEA;color:#C0392B;}.bb{background:#EEF2F8;color:#324569;}.bz{background:rgba(44,44,44,.08);color:#4A4A4A;}.bv{background:#F3EEF8;color:#56336D;}.bor{background:#FEF0E6;color:#E67E22;}
 .agl{position:relative;padding-left:14px;}
 .agl::before{content:'';position:absolute;left:4px;top:10px;bottom:10px;width:1px;background:var(--bo);}
 .age{position:relative;display:flex;gap:10px;padding:6px 0;}
@@ -161,7 +161,7 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--cr);}
     <div class="hp" id="phrase">Processos claros transformam empresas</div>
   </div>
   <div class="hr2">
-    <div><div class="hdate">Quarta-feira, 13 de maio de 2026</div><div class="htime" id="clock">14:12</div></div>
+    <div><div class="hdate" id="hdate"></div><div class="htime" id="clock"></div></div>
     <div class="hwx"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>24°C &nbsp;Brasília</div>
   </div>
 </header>
@@ -415,7 +415,7 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--cr);}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 
-var TODAY = new Date('2026-05-13');
+var TODAY = new Date();
 var prevScreen = 's-main';
 
 // ── PROCESSOS (nomes do dia a dia de locação) ──────────────────────────────
@@ -428,7 +428,7 @@ var PROCS=[
   {key:'rescisao',    name:'Rescisão de Contrato',       active:23,late:7, done:123,color:'#1A6B8A',phase:false},
   {key:'renovacao',   name:'Renovação de Contratos',     active:16,late:3, done:247,color:'#2E7D32',phase:false},
   {key:'captacao',    name:'Captação de Imóveis',        active:11,late:2, done:5,  color:'#5D4037',phase:false},
-  {key:'alug_gest',  name:'Gestão de Imóveis Anunciados', active:31,late:7, done:67, color:'#8B4513',phase:false},
+  {key:'alug_gest',  name:'Gestão de Imóveis Anunciados', active:12,late:7, done:67, color:'#8B4513',phase:false},
 ];
 
 // ── USUÁRIOS (nomes genéricos) ─────────────────────────────────────────────
@@ -567,16 +567,16 @@ var MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','De
 var ALUG_IMOVEIS=[
   {cod:'AP-0142',end:'SQN 213 Bl. C Apt. XXX',  tipo:'Apartamento',   val:'R$ 3.200', fase:'Anunciado',           resp:'Carlos Mendes',  dias:18,leads:24,sit:'Normal'},
   {cod:'AP-0156',end:'SQS 308 Bl. A Apt. XXX',  tipo:'Apartamento',   val:'R$ 2.800', fase:'Em negociação',       resp:'Ana Paula',      dias:7, leads:41,sit:'Normal'},
-  {cod:'CS-0031',end:'Park Way Qd. 29 Conj. 4', tipo:'Casa',          val:'R$ 6.500', fase:'Anunciado',           resp:'Carlos Mendes',  dias:72,leads:8, sit:'Crítico'},
-  {cod:'AP-0178',end:'SQN 404 Bl. G Apt. XXX',  tipo:'Apartamento',   val:'R$ 1.950', fase:'Aguardando vistoria', resp:'Fernanda Lopes', dias:45,leads:15,sit:'Atenção'},
-  {cod:'SL-0019',end:'CLN 304 Bl. A Sala XXX',  tipo:'Sala Comercial',val:'R$ 4.100', fase:'Anunciado',           resp:'Rafael Torres',  dias:33,leads:6, sit:'Atenção'},
+  {cod:'CS-0031',end:'Park Way Qd. 29 Conj. 4', tipo:'Casa',          val:'R$ 6.500', fase:'Anunciado',           resp:'Carlos Mendes',  dias:72,leads:8, sit:'Necessidade de manutenção'},
+  {cod:'AP-0178',end:'SQN 404 Bl. G Apt. XXX',  tipo:'Apartamento',   val:'R$ 1.950', fase:'Aguardando vistoria', resp:'Fernanda Lopes', dias:45,leads:15,sit:'Valor desatualizado'},
+  {cod:'SL-0019',end:'CLN 304 Bl. A Sala XXX',  tipo:'Sala Comercial',val:'R$ 4.100', fase:'Anunciado',           resp:'Rafael Torres',  dias:33,leads:6, sit:'Placa danificada'},
   {cod:'AP-0201',end:'SHIS QI 11 Conj. 6',      tipo:'Apartamento',   val:'R$ 5.200', fase:'Anunciado',           resp:'Ana Paula',      dias:12,leads:37,sit:'Normal'},
-  {cod:'CS-0044',end:'SMPW Qd. 12 Conj. 3',     tipo:'Casa',          val:'R$ 8.900', fase:'Em negociação',       resp:'Rafael Torres',  dias:58,leads:11,sit:'Atenção'},
-  {cod:'AP-0099',end:'SQS 116 Bl. F Apt. XXX',  tipo:'Apartamento',   val:'R$ 2.200', fase:'Anunciado',           resp:'Fernanda Lopes', dias:91,leads:3, sit:'Crítico'},
+  {cod:'CS-0044',end:'SMPW Qd. 12 Conj. 3',     tipo:'Casa',          val:'R$ 8.900', fase:'Em negociação',       resp:'Rafael Torres',  dias:58,leads:11,sit:'Imóvel sujo'},
+  {cod:'AP-0099',end:'SQS 116 Bl. F Apt. XXX',  tipo:'Apartamento',   val:'R$ 2.200', fase:'Anunciado',           resp:'Fernanda Lopes', dias:91,leads:3, sit:'Necessidade de manutenção'},
   {cod:'AP-0233',end:'SQN 115 Bl. B Apt. XXX',  tipo:'Apartamento',   val:'R$ 3.600', fase:'Anunciado',           resp:'Carlos Mendes',  dias:22,leads:28,sit:'Normal'},
-  {cod:'SL-0027',end:'CLS 202 Bl. A Sala XXX',  tipo:'Sala Comercial',val:'R$ 2.750', fase:'Aguardando vistoria', resp:'Ana Paula',      dias:67,leads:5, sit:'Crítico'},
+  {cod:'SL-0027',end:'CLS 202 Bl. A Sala XXX',  tipo:'Sala Comercial',val:'R$ 2.750', fase:'Aguardando vistoria', resp:'Ana Paula',      dias:67,leads:5, sit:'Valor desatualizado'},
   {cod:'CS-0051',end:'QI 25 Conj. 14 Lago Sul', tipo:'Casa',          val:'R$ 11.000',fase:'Anunciado',           resp:'Rafael Torres',  dias:15,leads:19,sit:'Normal'},
-  {cod:'AP-0187',end:'SQS 412 Bl. D Apt. XXX',  tipo:'Apartamento',   val:'R$ 3.100', fase:'Em negociação',       resp:'Fernanda Lopes', dias:39,leads:22,sit:'Atenção'},
+  {cod:'AP-0187',end:'SQS 412 Bl. D Apt. XXX',  tipo:'Apartamento',   val:'R$ 3.100', fase:'Em negociação',       resp:'Fernanda Lopes', dias:39,leads:22,sit:'Placa danificada'},
 ];
 
 var WEEKLY_DATA=[85,78,62];
@@ -586,7 +586,6 @@ var WEEKLY_LABELS=['Seg 11/05','Ter 12/05','Qua 13/05 (hoje)'];
 var isDemoMode=new URLSearchParams(window.location.search).get('demo')==='true';
 if(isDemoMode){
   document.getElementById('demo-banner').style.display='flex';
-  document.querySelector('.hdate').textContent='Quinta-feira, 28 de maio de 2026';
   PROCS=[
     {key:'efetivacao', name:'Locação',                            active:38,late:4, done:312,color:'#C0392B',phase:true},
     {key:'venda',      name:'Venda',                              active:27,late:2, done:89, color:'#324569',phase:false},
@@ -596,7 +595,7 @@ if(isDemoMode){
     {key:'rescisao',   name:'Rescisão de Aluguel',                active:12,late:3, done:134,color:'#1A6B8A',phase:false},
     {key:'marketing',  name:'Marketing',                          active:19,late:1, done:56, color:'#7B5EA7',phase:false},
     {key:'onboarding', name:'Onboarding Proprietário',            active:9, late:0, done:43, color:'#2E7D32',phase:false},
-    {key:'alug_gest',  name:'Gestão de Imóveis Anunciados', active:31,late:7, done:67, color:'#8B4513',phase:false},
+    {key:'alug_gest',  name:'Gestão de Imóveis Anunciados', active:12,late:7, done:67, color:'#8B4513',phase:false},
   ];
   USERS={
     'Fernanda Lima':  {total:25,ongoing:18,pending:7,late:3},
@@ -1001,14 +1000,14 @@ function buildAlugPage(){
   });
 
   // Gráfico 3 — Status da Carteira (donut)
-  var sc={Normal:0,Atenção:0,Crítico:0};
+  var sc={'Normal':0,'Placa danificada':0,'Valor desatualizado':0,'Imóvel sujo':0,'Necessidade de manutenção':0};
   ALUG_IMOVEIS.forEach(function(im){sc[im.sit]++;});
   if(alugStatusChartInst){alugStatusChartInst.destroy();alugStatusChartInst=null;}
   alugStatusChartInst=new Chart(document.getElementById('alugStatusChart'),{
     type:'doughnut',
     data:{
-      labels:['Normal','Atenção','Crítico'],
-      datasets:[{data:[sc.Normal,sc['Atenção'],sc['Crítico']],backgroundColor:['#2E7D32','#D4820A','#C0392B'],borderWidth:2,borderColor:'#FDF9F0'}]
+      labels:['Normal','Placa danificada','Valor desatualizado','Imóvel sujo','Necessidade de manutenção'],
+      datasets:[{data:[sc['Normal'],sc['Placa danificada'],sc['Valor desatualizado'],sc['Imóvel sujo'],sc['Necessidade de manutenção']],backgroundColor:['#2E7D32','#D4820A','#D4820A','#E67E22','#C0392B'],borderWidth:2,borderColor:'#FDF9F0'}]
     },
     options:{
       responsive:true,maintainAspectRatio:false,cutout:'55%',
@@ -1016,7 +1015,7 @@ function buildAlugPage(){
     }
   });
   document.getElementById('alug-status-legend').innerHTML=
-    [['Normal','#2E7D32',sc.Normal],['Atenção','#D4820A',sc['Atenção']],['Crítico','#C0392B',sc['Crítico']]].map(function(x){
+    [['Normal','#2E7D32',sc['Normal']],['Placa danificada','#D4820A',sc['Placa danificada']],['Valor desatualizado','#D4820A',sc['Valor desatualizado']],['Imóvel sujo','#E67E22',sc['Imóvel sujo']],['Necessidade de manutenção','#C0392B',sc['Necessidade de manutenção']]].map(function(x){
       return '<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;">'
         +'<div style="width:10px;height:10px;border-radius:2px;background:'+x[1]+';flex-shrink:0;"></div>'
         +'<span style="font-size:10px;color:var(--gm);flex:1;">'+x[0]+'</span>'
@@ -1026,14 +1025,14 @@ function buildAlugPage(){
 }
 
 function renderAlugTable(filter){
-  var data=filter==='late'?ALUG_IMOVEIS.filter(function(im){return im.sit==='Crítico';}):ALUG_IMOVEIS;
-  document.getElementById('table-label').textContent=filter==='late'?'Imóveis Críticos':'Imóveis Anunciados';
+  var data=filter==='late'?ALUG_IMOVEIS.filter(function(im){return im.sit!=='Normal';}):ALUG_IMOVEIS;
+  document.getElementById('table-label').textContent=filter==='late'?'Imóveis com Pendência':'Imóveis Anunciados';
   var thead=document.querySelector('#tc-ativos table thead tr');
   if(thead)thead.innerHTML='<th>Código</th><th>Endereço</th><th>Tipo</th><th>Valor</th><th>Fase</th><th>Responsável</th><th style="text-align:center;">Dias</th><th style="text-align:center;">Leads</th><th>Situação</th>';
   document.getElementById('p-tbody').innerHTML=data.map(function(im){
-    var sitCls=im.sit==='Normal'?'bg':im.sit==='Atenção'?'ba':'br';
-    var daysBg=im.sit==='Normal'?'#E8F5E9':im.sit==='Atenção'?'#FFF3E0':'#FDECEA';
-    var daysCol=im.sit==='Normal'?'#2E7D32':im.sit==='Atenção'?'#D4820A':'#C0392B';
+    var sitCls=im.sit==='Normal'?'bg':im.sit==='Placa danificada'?'ba':im.sit==='Valor desatualizado'?'ba':im.sit==='Imóvel sujo'?'bor':'br';
+    var daysBg=im.dias<=30?'#E8F5E9':im.dias<=60?'#FFF3E0':'#FDECEA';
+    var daysCol=im.dias<=30?'#2E7D32':im.dias<=60?'#D4820A':'#C0392B';
     var faseCls=im.fase==='Em negociação'?'bb':im.fase==='Aguardando vistoria'?'ba':'bz';
     return '<tr>'
       +'<td class="tn">'+im.cod+'</td>'
@@ -1053,7 +1052,7 @@ function showProcess(p){
   var isAlug=p.key==='alug_gest';
   document.getElementById('alug-extra').style.display=isAlug?'block':'none';
   document.getElementById('p-title').textContent=p.name;
-  document.getElementById('p-sub').textContent=isAlug?'31 imóveis ativos  7 vencidos':p.active+' cards ativos  '+p.late+' vencidos';
+  document.getElementById('p-sub').textContent=isAlug?p.active+' imóveis ativos  '+p.late+' vencidos':p.active+' cards ativos  '+p.late+' vencidos';
   document.getElementById('p-bc').textContent=p.name;
   document.getElementById('p-active').textContent=p.active;
   document.getElementById('p-late').textContent=p.late;
@@ -1273,11 +1272,16 @@ document.getElementById('btn-back-p').addEventListener('click',function(){showSc
 document.getElementById('btn-back-u').addEventListener('click',function(){showScreen(prevScreen);});
 document.getElementById('btn-back-h').addEventListener('click',function(){showScreen('s-main');});
 
-// ─── RELÓGIO ──────────────────────────────────────────
-setInterval(function(){
+// ─── RELÓGIO E DATA ───────────────────────────────────
+var DAYS_PT=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+var MONTHS_PT=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+function updateClock(){
   var n=new Date();
   document.getElementById('clock').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
-},15000);
+  document.getElementById('hdate').textContent=DAYS_PT[n.getDay()]+', '+n.getDate()+' de '+MONTHS_PT[n.getMonth()]+' de '+n.getFullYear();
+}
+updateClock();
+setInterval(updateClock,60000);
 
 // ─── FRASE DINÂMICA VIA CLAUDE API ────────────────────
 (function(){

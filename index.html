@@ -144,7 +144,7 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--cr);}
 .rank-metrics{display:flex;gap:16px;margin-top:10px;}
 .rank-metric-l{font-size:9px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;}
 .rank-metric-v{font-size:18px;font-weight:700;line-height:1;}
-.alug-charts{display:grid;grid-template-columns:1fr 1fr 280px;gap:14px;margin-bottom:14px;}
+.alug-charts{display:grid;grid-template-columns:7fr 3fr;gap:14px;margin-bottom:14px;}
 @media(max-width:960px){.alug-charts{grid-template-columns:1fr!important;}.rank-grid{grid-template-columns:1fr!important;}}
 </style>
 </head>
@@ -314,13 +314,13 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--cr);}
         <div style="position:relative;height:270px;"><canvas id="alugDaysChart"></canvas></div>
       </div>
       <div class="card">
-        <div class="ch"><div class="ct">Leads Recebidos</div></div>
-        <div style="position:relative;height:270px;"><canvas id="alugLeadsChart"></canvas></div>
-      </div>
-      <div class="card">
         <div class="ch"><div class="ct">Status da Carteira</div></div>
-        <div style="position:relative;height:185px;"><canvas id="alugStatusChart"></canvas></div>
+        <div style="position:relative;height:210px;"><canvas id="alugStatusChart"></canvas></div>
         <div id="alug-status-legend" style="margin-top:10px;"></div>
+      </div>
+      <div class="card" style="grid-column:1/-1;">
+        <div class="ch"><div class="ct">Leads Recebidos</div></div>
+        <div style="position:relative;height:190px;"><canvas id="alugLeadsChart"></canvas></div>
       </div>
     </div>
   </div>

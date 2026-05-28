@@ -137,6 +137,7 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--cr);}
 .vac-soon{font-size:9px;color:#C0392B;font-weight:700;background:#FDECEA;padding:2px 6px;border-radius:10px;}
 .weekly-chart-wrap{position:relative;height:120px;}
 .hbtn{font-size:10px;color:var(--az);cursor:pointer;background:none;border:none;font-family:var(--fn);text-decoration:underline;}
+.demo-banner{display:none;align-items:center;justify-content:center;gap:8px;background:#FFF8E1;border-bottom:2px solid #D4820A;padding:9px 24px;font-size:11px;font-weight:700;color:#7D5A00;letter-spacing:.06em;position:sticky;top:60px;z-index:99;}
 </style>
 </head>
 <body>
@@ -156,13 +157,17 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--cr);}
     <div class="hwx"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>24°C &nbsp;Brasília</div>
   </div>
 </header>
+<div class="demo-banner" id="demo-banner">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D4820A" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  ⚠ MODO DEMONSTRAÇÃO — dados fictícios para apresentação
+</div>
 <div class="main">
 
 <!-- MAIN -->
 <div id="s-main" class="screen active">
 <div class="quad">
 
-  <div class="card">
+  <div class="card" id="agenda-card">
     <div class="ch">
       <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agenda</div>
       <span class="bx bz">13/05 · Qua</span>
@@ -199,7 +204,7 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--cr);}
     <div class="csi">
       <div class="pw">
         <canvas id="pieChart" role="img" aria-label="Processos ativos por pipe">187 cards em 8 pipes.</canvas>
-        <div class="pc"><div class="pn">187</div><div class="ps">cards ativos</div></div>
+        <div class="pc"><div class="pn" id="pie-total-count">187</div><div class="ps">cards ativos</div></div>
       </div>
       <div class="leg" id="pie-legend">
         <div class="leg-hdr"><span class="leg-hn">Processo</span><span class="leg-hc">Ativos&nbsp;&nbsp;Venc.</span></div>
@@ -214,10 +219,10 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--cr);}
       <span class="bx bz">Tarefas Notion</span>
     </div>
     <div class="opm">
-      <div class="om"><div class="ol">Total</div><div class="ov">103</div></div>
-      <div class="om"><div class="ol">Em andamento</div><div class="ov" style="color:#324569;">71</div></div>
-      <div class="om"><div class="ol">Não iniciadas</div><div class="ov" style="color:#D4820A;">32</div></div>
-      <div class="om od"><div class="ol">Atrasadas</div><div class="ov">11</div></div>
+      <div class="om"><div class="ol">Total</div><div class="ov" id="op-total">103</div></div>
+      <div class="om"><div class="ol">Em andamento</div><div class="ov" id="op-ongoing" style="color:#324569;">71</div></div>
+      <div class="om"><div class="ol">Não iniciadas</div><div class="ov" id="op-pending" style="color:#D4820A;">32</div></div>
+      <div class="om od"><div class="ol">Atrasadas</div><div class="ov" id="op-late">11</div></div>
     </div>
     <div style="position:relative;height:162px;"><canvas id="barChart" role="img" aria-label="Tarefas por responsável"></canvas></div>
     <p class="ch2">Clique em um nome para ver as tarefas do responsável</p>
@@ -247,7 +252,7 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--cr);}
           <canvas id="liderGauge" role="img" aria-label="Gauge rotinas lider">56% das rotinas confirmadas.</canvas>
           <div class="lider-gauge-center"><div class="lider-pct" id="lider-pct">56%</div><div class="lider-sub">confirmadas</div></div>
         </div>
-        <div style="text-align:center;font-size:10px;color:var(--mu);">5 / 9 rotinas</div>
+        <div style="text-align:center;font-size:10px;color:var(--mu);" id="lider-count">5 / 9 rotinas</div>
       </div>
       <div>
         <div class="lider-info">
@@ -389,6 +394,7 @@ var PROCS=[
   {key:'rescisao',    name:'Rescisão de Contrato',       active:23,late:7, done:123,color:'#1A6B8A',phase:false},
   {key:'renovacao',   name:'Renovação de Contratos',     active:16,late:3, done:247,color:'#2E7D32',phase:false},
   {key:'captacao',    name:'Captação de Imóveis',        active:11,late:2, done:5,  color:'#5D4037',phase:false},
+  {key:'alug_gest',  name:'ALUG: Gestão de Imóveis Anunciados', active:31,late:7, done:67, color:'#8B4513',phase:false},
 ];
 
 // ── USUÁRIOS (nomes genéricos) ─────────────────────────────────────────────
@@ -521,6 +527,126 @@ var CONCLUDED_MONTH=[
   {t:'Locação efetivada — Apt. 303 Bl. A',              d:'29/04/2026',r:'Beatriz Nunes'},
 ];
 var MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+var WEEKLY_DATA=[85,78,62];
+var WEEKLY_LABELS=['Seg 11/05','Ter 12/05','Qua 13/05 (hoje)'];
+
+// ── MODO DEMO (?demo=true) ────────────────────────────────────────────────
+var isDemoMode=new URLSearchParams(window.location.search).get('demo')==='true';
+if(isDemoMode){
+  document.getElementById('demo-banner').style.display='flex';
+  document.querySelector('.hdate').textContent='Quinta-feira, 28 de maio de 2026';
+  PROCS=[
+    {key:'efetivacao', name:'Locação',                            active:38,late:4, done:312,color:'#C0392B',phase:true},
+    {key:'venda',      name:'Venda',                              active:27,late:2, done:89, color:'#324569',phase:false},
+    {key:'vistoria',   name:'Vistoria de Imóveis',                active:22,late:5, done:287,color:'#405941',phase:false},
+    {key:'reparos',    name:'Reparos',                            active:18,late:8, done:195,color:'#56336D',phase:false},
+    {key:'inadimpl',   name:'Inadimplência',                      active:15,late:6, done:178,color:'#D4820A',phase:false},
+    {key:'rescisao',   name:'Rescisão de Aluguel',                active:12,late:3, done:134,color:'#1A6B8A',phase:false},
+    {key:'marketing',  name:'Marketing',                          active:19,late:1, done:56, color:'#7B5EA7',phase:false},
+    {key:'onboarding', name:'Onboarding Proprietário',            active:9, late:0, done:43, color:'#2E7D32',phase:false},
+    {key:'alug_gest',  name:'ALUG: Gestão de Imóveis Anunciados', active:31,late:7, done:67, color:'#8B4513',phase:false},
+  ];
+  USERS={
+    'Fernanda Lima':  {total:25,ongoing:18,pending:7,late:3},
+    'Ricardo Mendes': {total:24,ongoing:16,pending:8,late:3},
+    'Camila Rocha':   {total:22,ongoing:15,pending:7,late:2},
+    'Thiago Alves':   {total:21,ongoing:14,pending:7,late:2},
+    'Patrícia Gomes': {total:18,ongoing:12,pending:6,late:2},
+  };
+  UKEYS=Object.keys(USERS);
+  COLLABS=[
+    {name:'Fernanda Lima',  done:8,total:9,color:'#324569',isLider:true},
+    {name:'Ricardo Mendes', done:7,total:9,color:'#405941',isLider:false},
+    {name:'Camila Rocha',   done:6,total:9,color:'#56336D',isLider:false},
+    {name:'Thiago Alves',   done:8,total:9,color:'#C0392B',isLider:false},
+    {name:'Patrícia Gomes', done:5,total:9,color:'#D4820A',isLider:false},
+    {name:'Lucas Barros',   done:7,total:9,color:'#1A6B8A',isLider:false},
+  ];
+  HR={
+    'Fernanda Lima':  {role:'Gestora Geral',    adm:'10/03/2020',sal:5200,vacS:'2026-07-01',vacE:'2026-07-30',abs:1},
+    'Ricardo Mendes': {role:'Dir. Operacional', adm:'15/06/2018',sal:5800,vacS:'2026-09-01',vacE:'2026-09-30',abs:0},
+    'Camila Rocha':   {role:'Coord. Locação',   adm:'20/11/2021',sal:4300,vacS:'2026-08-01',vacE:'2026-08-30',abs:2},
+    'Thiago Alves':   {role:'An. Financeiro',   adm:'05/04/2022',sal:4100,vacS:'2026-10-01',vacE:'2026-10-30',abs:1},
+    'Patrícia Gomes': {role:'Coord. Jurídica',  adm:'18/09/2019',sal:5000,vacS:'2026-11-01',vacE:'2026-11-30',abs:0},
+    'Lucas Barros':   {role:'An. Comercial',    adm:'03/02/2023',sal:3900,vacS:'2026-12-01',vacE:'2026-12-30',abs:3},
+  };
+  UPROCS={
+    'Fernanda Lima':  [{p:'Locação',n:15,l:1},{p:'Onboarding Proprietário',n:6,l:0}],
+    'Ricardo Mendes': [{p:'Vistoria de Imóveis',n:10,l:2},{p:'Reparos',n:8,l:1}],
+    'Camila Rocha':   [{p:'Locação',n:12,l:1},{p:'Rescisão de Aluguel',n:5,l:0}],
+    'Thiago Alves':   [{p:'Inadimplência',n:9,l:3},{p:'ALUG: Gestão de Imóveis Anunciados',n:7,l:2}],
+    'Patrícia Gomes': [{p:'Rescisão de Aluguel',n:7,l:2},{p:'Inadimplência',n:6,l:1}],
+    'Lucas Barros':   [{p:'Marketing',n:12,l:0},{p:'Venda',n:8,l:1}],
+  };
+  TASKS={
+    'Fernanda Lima':[
+      {n:'Reunião de alinhamento operacional',      s:'Em andamento',d:'29/05',p:'Alta', l:false},
+      {n:'Revisar KPIs e metas de maio',            s:'Em andamento',d:'30/05',p:'Alta', l:false},
+      {n:'Aprovar contratos em fase final',         s:'Nao iniciada', d:'27/05',p:'Alta', l:true},
+      {n:'Preparar relatório para diretoria',       s:'Nao iniciada', d:'26/05',p:'Media',l:true},
+    ],
+    'Ricardo Mendes':[
+      {n:'Acompanhar pipeline de locações',         s:'Em andamento',d:'30/05',p:'Alta', l:false},
+      {n:'Validar orçamentos de reparos pendentes', s:'Em andamento',d:'29/05',p:'Media',l:false},
+      {n:'Organizar agenda de visitas da semana',   s:'Nao iniciada', d:'28/05',p:'Media',l:true},
+    ],
+    'Camila Rocha':[
+      {n:'Renovar contrato Apt. 102 Bl. A',         s:'Em andamento',d:'29/05',p:'Alta', l:false},
+      {n:'Conferir vistorias pendentes de saída',   s:'Em andamento',d:'28/05',p:'Media',l:false},
+      {n:'Atualizar status de contratos ativos',    s:'Nao iniciada', d:'27/05',p:'Baixa',l:false},
+    ],
+    'Thiago Alves':[
+      {n:'Enviar notificações de inadimplência',    s:'Em andamento',d:'27/05',p:'Alta', l:true},
+      {n:'Conciliar pagamentos de maio',            s:'Em andamento',d:'29/05',p:'Alta', l:false},
+      {n:'Fechar repasses do mês',                  s:'Nao iniciada', d:'30/05',p:'Alta', l:false},
+    ],
+    'Patrícia Gomes':[
+      {n:'Analisar rescisões em aberto',            s:'Em andamento',d:'28/05',p:'Alta', l:false},
+      {n:'Revisar cláusulas de contratos novos',    s:'Nao iniciada', d:'29/05',p:'Media',l:false},
+    ],
+  };
+  CCARDS=[
+    {t:'Locação — Apt. 201 Bl. A / Locatário Demo A',     ph:'Assinatura Contrato',r:'Camila Rocha',  l:false},
+    {t:'Locação — Casa Q5 Lt 8 / Locatário Demo B',       ph:'Assinatura Contrato',r:'Camila Rocha',  l:false},
+    {t:'Locação — Sala 104 Ed. Atrium / Empresa Demo X',  ph:'Documentação',       r:'Ricardo Mendes',l:false},
+    {t:'Locação — Apt. 302 Torre Norte / Locatário Demo C',ph:'Assinatura Contrato',r:'Sistema',      l:true},
+    {t:'Locação — Cobertura Bl. D / Locatário Demo D',    ph:'Aprovação Gerencial',r:'Fernanda Lima', l:true},
+    {t:'Locação — Casa Q8 Lt 3 / Locatário Demo E',       ph:'Análise Cadastral',  r:'Camila Rocha',  l:false},
+    {t:'Locação — Sala 210 Ed. Central / Empresa Demo Y', ph:'Proposta',           r:'Ricardo Mendes',l:false},
+    {t:'Locação — Apt. 404 Bl. C / Locatário Demo F',     ph:'Documentação',       r:'Camila Rocha',  l:true},
+  ];
+  MONTHLY={
+    efetivacao:{2025:[10,14,12,18,11,20,17,22,15,19,25,21],2026:[16,20,17,23,14,0,0,0,0,0,0,0]},
+    def:       {2025:[7,10,9,13,8,12,10,16,11,14,18,15], 2026:[10,13,11,16,12,0,0,0,0,0,0,0]}
+  };
+  CONCLUDED_MONTH=[
+    {t:'Locação efetivada — Apt. 201 Bl. A',         d:'03/04/2026',r:'Camila Rocha'},
+    {t:'Locação efetivada — Casa Q5 Lt 8',           d:'06/04/2026',r:'Ricardo Mendes'},
+    {t:'Locação efetivada — Sala 104 Ed. Atrium',    d:'09/04/2026',r:'Camila Rocha'},
+    {t:'Locação efetivada — Apt. 302 Torre Norte',   d:'12/04/2026',r:'Fernanda Lima'},
+    {t:'Locação efetivada — Cobertura Bl. D',        d:'15/04/2026',r:'Ricardo Mendes'},
+    {t:'Locação efetivada — Galpão Industrial Q7',   d:'18/04/2026',r:'Sistema'},
+    {t:'Locação efetivada — Apt. 103 Bl. B',         d:'22/04/2026',r:'Camila Rocha'},
+    {t:'Locação efetivada — Loja Centro Comercial',  d:'25/04/2026',r:'Sistema'},
+  ];
+  WEEKLY_DATA=[82,71,68];
+  WEEKLY_LABELS=['Seg 25/05','Ter 26/05','Qua 27/05 (hoje)'];
+  // Op counters
+  document.getElementById('op-total').textContent='110';
+  document.getElementById('op-ongoing').textContent='75';
+  document.getElementById('op-pending').textContent='35';
+  document.getElementById('op-late').textContent='12';
+  // Agenda card
+  var ac=document.getElementById('agenda-card');
+  ac.querySelector('.agl').innerHTML=
+    '<div class="age"><div class="agd done"></div><div class="agt">09:00<br>09:45</div><div><div class="agn done">Alinhamento Semanal da Equipe</div><div class="ags">Sala de Reunião</div></div></div>'
+   +'<div class="age"><div class="agd done"></div><div class="agt">10:30<br>11:00</div><div><div class="agn done">Vistoria — Apt. 301 Bl. B</div><div class="ags">Locatário Demo · Camila Rocha</div></div></div>'
+   +'<div class="age"><div class="agd"></div><div class="agt">14:30<br>15:30</div><div><div class="agn">Entrega de Chaves — Casa Q5 Lt 8</div><div class="ags">Locatário Demo · Locação nº 2048</div></div></div>';
+  ac.querySelector('.agempty').style.display='none';
+  ac.querySelector('.agnx').innerHTML='<div class="agnxl">Próximos dias</div>'
+   +'<div class="agnxr"><span class="agnxd">Qui</span><span class="bx bb">Apresentação ARCOS — 14h</span></div>'
+   +'<div class="agnxr" style="margin-top:4px;"><span class="agnxd">Sex</span><span class="bx ba">Reunião com proprietários novos</span></div>';
+}
 
 // ═══════════════════════════════════════════════════════
 // UTILS
@@ -547,6 +673,7 @@ function svgGauge(pct,color,sz){
 // ═══════════════════════════════════════════════════════
 // GRÁFICO PIZZA — CONSTRUÇÃO
 // ═══════════════════════════════════════════════════════
+(function(){var tot=PROCS.reduce(function(s,p){return s+p.active;},0);document.getElementById('pie-total-count').textContent=tot;})();
 var pieChart=new Chart(document.getElementById('pieChart'),{
   type:'doughnut',
   data:{
@@ -607,8 +734,8 @@ var barChart=new Chart(document.getElementById('barChart'),{
 new Chart(document.getElementById('weeklyChart'),{
   type:'bar',
   data:{
-    labels:['Seg 11/05','Ter 12/05','Qua 13/05 (hoje)'],
-    datasets:[{data:[85,78,62],backgroundColor:['#324569','#324569','rgba(50,69,105,.5)'],borderRadius:4}]
+    labels:WEEKLY_LABELS,
+    datasets:[{data:WEEKLY_DATA,backgroundColor:['#324569','#324569','rgba(50,69,105,.5)'],borderRadius:4}]
   },
   options:{
     responsive:true,maintainAspectRatio:false,
@@ -628,6 +755,17 @@ function buildLiderGauge(){
   var lider=COLLABS.find(function(c){return c.isLider;});
   var pct=Math.round(lider.done/lider.total*100);
   document.getElementById('lider-pct').textContent=pct+'%';
+  document.getElementById('lider-count').textContent=lider.done+' / '+lider.total+' rotinas';
+  document.getElementById('lider-avatar').textContent=initials(lider.name);
+  document.getElementById('lider-avatar').style.background=lider.color;
+  document.querySelector('.lider-name').textContent=lider.name;
+  var lhr=HR[lider.name];
+  if(lhr){
+    document.querySelector('.lider-role').textContent=lhr.role;
+    var vb=document.querySelector('.vac-soon');
+    var vdays=vacDaysLeft(lhr.vacS);
+    if(vb){vb.textContent='férias em '+vdays+'d';vb.style.display=(vdays>=0&&vdays<=30)?'':'none';}
+  }
   if(liderGaugeInst){liderGaugeInst.destroy();}
   liderGaugeInst=new Chart(document.getElementById('liderGauge'),{
     type:'doughnut',

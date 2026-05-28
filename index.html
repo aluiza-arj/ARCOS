@@ -138,6 +138,14 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--cr);}
 .weekly-chart-wrap{position:relative;height:120px;}
 .hbtn{font-size:10px;color:var(--az);cursor:pointer;background:none;border:none;font-family:var(--fn);text-decoration:underline;}
 .demo-banner{display:none;align-items:center;justify-content:center;gap:8px;background:#FFF8E1;border-bottom:2px solid #D4820A;padding:9px 24px;font-size:11px;font-weight:700;color:#7D5A00;letter-spacing:.06em;position:sticky;top:60px;z-index:99;}
+.days-badge{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;font-size:12px;font-weight:700;flex-shrink:0;}
+.rank-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.rank-card{background:var(--cr);border:1px solid var(--bo);border-radius:10px;padding:16px;}
+.rank-metrics{display:flex;gap:16px;margin-top:10px;}
+.rank-metric-l{font-size:9px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;}
+.rank-metric-v{font-size:18px;font-weight:700;line-height:1;}
+.alug-charts{display:grid;grid-template-columns:1fr 1fr 280px;gap:14px;margin-bottom:14px;}
+@media(max-width:960px){.alug-charts{grid-template-columns:1fr!important;}.rank-grid{grid-template-columns:1fr!important;}}
 </style>
 </head>
 <body>
@@ -291,6 +299,32 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--cr);}
     <div class="mf clickable" id="pf-pct"><div class="ml">% vencidos</div><div class="mv" id="p-pct">—</div></div>
     <div class="mf mi clickable" id="pf-hist"><div class="ml">Concluídos (total)</div><div class="mv" id="p-done">—</div></div>
   </div>
+  <!-- ALUG: Gestão de Imóveis Anunciados — conteúdo exclusivo -->
+  <div id="alug-extra" style="display:none;">
+    <div class="card" style="margin-bottom:14px;position:relative;">
+      <div style="position:absolute;top:14px;right:16px;font-size:9px;color:var(--mu);background:rgba(44,44,44,.07);padding:3px 9px;border-radius:20px;letter-spacing:.04em;">🔗 Super Lógica · dados simulados</div>
+      <div class="ch"><div class="ct"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Desempenho de Anúncios</div></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;" id="alug-kpis"></div>
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--az);margin-bottom:10px;">Top 3 Imóveis Mais Buscados</div>
+      <div class="rank-grid" id="alug-ranking"></div>
+    </div>
+    <div class="alug-charts" id="alug-charts-row">
+      <div class="card">
+        <div class="ch"><div class="ct">Tempo de Anúncio por Imóvel</div></div>
+        <div style="position:relative;height:270px;"><canvas id="alugDaysChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ct">Leads Recebidos</div></div>
+        <div style="position:relative;height:270px;"><canvas id="alugLeadsChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ct">Status da Carteira</div></div>
+        <div style="position:relative;height:185px;"><canvas id="alugStatusChart"></canvas></div>
+        <div id="alug-status-legend" style="margin-top:10px;"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="tabs">
     <button class="tbtn act" id="tab-ativos">Ativos</button>
     <button class="tbtn" id="tab-hist">Histórico por mês</button>
@@ -394,7 +428,7 @@ var PROCS=[
   {key:'rescisao',    name:'Rescisão de Contrato',       active:23,late:7, done:123,color:'#1A6B8A',phase:false},
   {key:'renovacao',   name:'Renovação de Contratos',     active:16,late:3, done:247,color:'#2E7D32',phase:false},
   {key:'captacao',    name:'Captação de Imóveis',        active:11,late:2, done:5,  color:'#5D4037',phase:false},
-  {key:'alug_gest',  name:'ALUG: Gestão de Imóveis Anunciados', active:31,late:7, done:67, color:'#8B4513',phase:false},
+  {key:'alug_gest',  name:'Gestão de Imóveis Anunciados', active:31,late:7, done:67, color:'#8B4513',phase:false},
 ];
 
 // ── USUÁRIOS (nomes genéricos) ─────────────────────────────────────────────
@@ -512,6 +546,7 @@ var ROTS=[
 // ── HISTÓRICO MENSAL ───────────────────────────────────────────────────────
 var MONTHLY={
   efetivacao:{2025:[12,18,15,20,14,22,19,25,16,21,28,24],2026:[18,22,19,25,0,0,0,0,0,0,0,0]},
+  alug_gest: {2025:[2,3,4,5,3,6,4,7,5,6,8,6],           2026:[4,6,5,8,7,0,0,0,0,0,0,0]},
   def:        {2025:[8,12,10,15,9,14,11,18,12,16,20,17], 2026:[12,15,13,18,0,0,0,0,0,0,0,0]}
 };
 var CONCLUDED_MONTH=[
@@ -527,6 +562,23 @@ var CONCLUDED_MONTH=[
   {t:'Locação efetivada — Apt. 303 Bl. A',              d:'29/04/2026',r:'Beatriz Nunes'},
 ];
 var MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+// ── IMÓVEIS ANUNCIADOS (Gestão de Imóveis Anunciados) ─────────────────────
+var ALUG_IMOVEIS=[
+  {cod:'AP-0142',end:'SQN 213 Bl. C Apt. XXX',  tipo:'Apartamento',   val:'R$ 3.200', fase:'Anunciado',           resp:'Carlos Mendes',  dias:18,leads:24,sit:'Normal'},
+  {cod:'AP-0156',end:'SQS 308 Bl. A Apt. XXX',  tipo:'Apartamento',   val:'R$ 2.800', fase:'Em negociação',       resp:'Ana Paula',      dias:7, leads:41,sit:'Normal'},
+  {cod:'CS-0031',end:'Park Way Qd. 29 Conj. 4', tipo:'Casa',          val:'R$ 6.500', fase:'Anunciado',           resp:'Carlos Mendes',  dias:72,leads:8, sit:'Crítico'},
+  {cod:'AP-0178',end:'SQN 404 Bl. G Apt. XXX',  tipo:'Apartamento',   val:'R$ 1.950', fase:'Aguardando vistoria', resp:'Fernanda Lopes', dias:45,leads:15,sit:'Atenção'},
+  {cod:'SL-0019',end:'CLN 304 Bl. A Sala XXX',  tipo:'Sala Comercial',val:'R$ 4.100', fase:'Anunciado',           resp:'Rafael Torres',  dias:33,leads:6, sit:'Atenção'},
+  {cod:'AP-0201',end:'SHIS QI 11 Conj. 6',      tipo:'Apartamento',   val:'R$ 5.200', fase:'Anunciado',           resp:'Ana Paula',      dias:12,leads:37,sit:'Normal'},
+  {cod:'CS-0044',end:'SMPW Qd. 12 Conj. 3',     tipo:'Casa',          val:'R$ 8.900', fase:'Em negociação',       resp:'Rafael Torres',  dias:58,leads:11,sit:'Atenção'},
+  {cod:'AP-0099',end:'SQS 116 Bl. F Apt. XXX',  tipo:'Apartamento',   val:'R$ 2.200', fase:'Anunciado',           resp:'Fernanda Lopes', dias:91,leads:3, sit:'Crítico'},
+  {cod:'AP-0233',end:'SQN 115 Bl. B Apt. XXX',  tipo:'Apartamento',   val:'R$ 3.600', fase:'Anunciado',           resp:'Carlos Mendes',  dias:22,leads:28,sit:'Normal'},
+  {cod:'SL-0027',end:'CLS 202 Bl. A Sala XXX',  tipo:'Sala Comercial',val:'R$ 2.750', fase:'Aguardando vistoria', resp:'Ana Paula',      dias:67,leads:5, sit:'Crítico'},
+  {cod:'CS-0051',end:'QI 25 Conj. 14 Lago Sul', tipo:'Casa',          val:'R$ 11.000',fase:'Anunciado',           resp:'Rafael Torres',  dias:15,leads:19,sit:'Normal'},
+  {cod:'AP-0187',end:'SQS 412 Bl. D Apt. XXX',  tipo:'Apartamento',   val:'R$ 3.100', fase:'Em negociação',       resp:'Fernanda Lopes', dias:39,leads:22,sit:'Atenção'},
+];
+
 var WEEKLY_DATA=[85,78,62];
 var WEEKLY_LABELS=['Seg 11/05','Ter 12/05','Qua 13/05 (hoje)'];
 
@@ -544,7 +596,7 @@ if(isDemoMode){
     {key:'rescisao',   name:'Rescisão de Aluguel',                active:12,late:3, done:134,color:'#1A6B8A',phase:false},
     {key:'marketing',  name:'Marketing',                          active:19,late:1, done:56, color:'#7B5EA7',phase:false},
     {key:'onboarding', name:'Onboarding Proprietário',            active:9, late:0, done:43, color:'#2E7D32',phase:false},
-    {key:'alug_gest',  name:'ALUG: Gestão de Imóveis Anunciados', active:31,late:7, done:67, color:'#8B4513',phase:false},
+    {key:'alug_gest',  name:'Gestão de Imóveis Anunciados', active:31,late:7, done:67, color:'#8B4513',phase:false},
   ];
   USERS={
     'Fernanda Lima':  {total:25,ongoing:18,pending:7,late:3},
@@ -574,7 +626,7 @@ if(isDemoMode){
     'Fernanda Lima':  [{p:'Locação',n:15,l:1},{p:'Onboarding Proprietário',n:6,l:0}],
     'Ricardo Mendes': [{p:'Vistoria de Imóveis',n:10,l:2},{p:'Reparos',n:8,l:1}],
     'Camila Rocha':   [{p:'Locação',n:12,l:1},{p:'Rescisão de Aluguel',n:5,l:0}],
-    'Thiago Alves':   [{p:'Inadimplência',n:9,l:3},{p:'ALUG: Gestão de Imóveis Anunciados',n:7,l:2}],
+    'Thiago Alves':   [{p:'Inadimplência',n:9,l:3},{p:'Gestão de Imóveis Anunciados',n:7,l:2}],
     'Patrícia Gomes': [{p:'Rescisão de Aluguel',n:7,l:2},{p:'Inadimplência',n:6,l:1}],
     'Lucas Barros':   [{p:'Marketing',n:12,l:0},{p:'Venda',n:8,l:1}],
   };
@@ -868,10 +920,140 @@ buildGauges();
 // TELA PROCESSO
 // ═══════════════════════════════════════════════════════
 var phaseChartCreated=false,monthChartInst=null,curProc=null,curYear=2026;
+var alugDaysChartInst=null,alugLeadsChartInst=null,alugStatusChartInst=null;
+
+// ── PÁGINA GESTÃO DE IMÓVEIS ANUNCIADOS ──────────────────────────────────
+function buildAlugPage(){
+  function sitBg(s){return s==='Normal'?'#E8F5E9':s==='Atenção'?'#FFF3E0':'#FDECEA';}
+  function sitColor(s){return s==='Normal'?'#2E7D32':s==='Atenção'?'#D4820A':'#C0392B';}
+
+  // KPIs Super Lógica
+  document.getElementById('alug-kpis').innerHTML=
+    '<div class="mf mi"><div class="ml">Total de leads</div><div class="mv">219</div></div>'
+   +'<div class="mf"><div class="ml">Média leads/imóvel</div><div class="mv">18,3</div></div>'
+   +'<div class="mf md"><div class="ml">Imóvel mais antigo</div><div class="mv">91 dias</div><div style="font-size:9px;color:rgba(192,57,43,.7);margin-top:3px;">AP-0099</div></div>'
+   +'<div class="mf"><div class="ml">Taxa de conversão</div><div class="mv">25%</div><div style="font-size:9px;color:var(--mu);margin-top:3px;">3 de 12 em negociação</div></div>';
+
+  // Ranking Top 3
+  var TOP3=[
+    {medal:'🥇',cod:'AP-0156',end:'SQS 308 Bl. A Apt. XXX',  tipo:'Apartamento',leads:41,dias:7},
+    {medal:'🥈',cod:'AP-0233',end:'SQN 115 Bl. B Apt. XXX',  tipo:'Apartamento',leads:28,dias:22},
+    {medal:'🥉',cod:'AP-0142',end:'SQN 213 Bl. C Apt. XXX',  tipo:'Apartamento',leads:24,dias:18},
+  ];
+  document.getElementById('alug-ranking').innerHTML=TOP3.map(function(r,i){
+    var alphas=['rgba(50,69,105,.06)','rgba(50,69,105,.04)','rgba(50,69,105,.03)'];
+    return '<div class="rank-card" style="background:'+alphas[i]+';">'
+      +'<div style="font-size:22px;margin-bottom:6px;">'+r.medal+'</div>'
+      +'<div style="font-size:13px;font-weight:700;color:var(--g);margin-bottom:1px;">'+r.cod+'</div>'
+      +'<div style="font-size:10px;color:var(--mu);margin-bottom:8px;line-height:1.4;">'+r.end+'</div>'
+      +'<span class="bx bb">'+r.tipo+'</span>'
+      +'<div class="rank-metrics">'
+      +'<div><div class="rank-metric-l">Leads</div><div class="rank-metric-v" style="color:var(--az);">'+r.leads+'</div></div>'
+      +'<div><div class="rank-metric-l">Dias</div><div class="rank-metric-v" style="color:var(--gm);">'+r.dias+'</div></div>'
+      +'</div></div>';
+  }).join('');
+
+  // Gráfico 1 — Tempo de Anúncio (barras horizontais)
+  if(alugDaysChartInst){alugDaysChartInst.destroy();alugDaysChartInst=null;}
+  alugDaysChartInst=new Chart(document.getElementById('alugDaysChart'),{
+    type:'bar',
+    data:{
+      labels:ALUG_IMOVEIS.map(function(im){return im.cod;}),
+      datasets:[{
+        data:ALUG_IMOVEIS.map(function(im){return im.dias;}),
+        backgroundColor:ALUG_IMOVEIS.map(function(im){
+          return im.sit==='Normal'?'rgba(46,125,50,.75)':im.sit==='Atenção'?'rgba(212,130,10,.75)':'rgba(192,57,43,.75)';
+        }),
+        borderRadius:3
+      }]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(i){return ' '+i.raw+' dias anunciado';}}}},
+      scales:{
+        x:{beginAtZero:true,ticks:{font:{size:9},color:'#7A7A7A'},grid:{color:'rgba(44,44,44,.07)'},title:{display:true,text:'dias',font:{size:9},color:'#7A7A7A'}},
+        y:{grid:{display:false},ticks:{font:{size:10},color:'#4A4A4A'}}
+      }
+    }
+  });
+
+  // Gráfico 2 — Leads (barras verticais, ordenadas)
+  var sorted=ALUG_IMOVEIS.slice().sort(function(a,b){return b.leads-a.leads;});
+  if(alugLeadsChartInst){alugLeadsChartInst.destroy();alugLeadsChartInst=null;}
+  alugLeadsChartInst=new Chart(document.getElementById('alugLeadsChart'),{
+    type:'bar',
+    data:{
+      labels:sorted.map(function(im){return im.cod;}),
+      datasets:[{
+        data:sorted.map(function(im){return im.leads;}),
+        backgroundColor:sorted.map(function(im,i){return i<3?'#324569':'rgba(50,69,105,.35)';}),
+        borderRadius:3
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(i){return ' '+i.raw+' leads recebidos';}}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:9},color:'#4A4A4A'}},
+        y:{beginAtZero:true,ticks:{font:{size:10},color:'#7A7A7A'},grid:{color:'rgba(44,44,44,.07)'}}
+      }
+    }
+  });
+
+  // Gráfico 3 — Status da Carteira (donut)
+  var sc={Normal:0,Atenção:0,Crítico:0};
+  ALUG_IMOVEIS.forEach(function(im){sc[im.sit]++;});
+  if(alugStatusChartInst){alugStatusChartInst.destroy();alugStatusChartInst=null;}
+  alugStatusChartInst=new Chart(document.getElementById('alugStatusChart'),{
+    type:'doughnut',
+    data:{
+      labels:['Normal','Atenção','Crítico'],
+      datasets:[{data:[sc.Normal,sc['Atenção'],sc['Crítico']],backgroundColor:['#2E7D32','#D4820A','#C0392B'],borderWidth:2,borderColor:'#FDF9F0'}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,cutout:'55%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(i){var tot=ALUG_IMOVEIS.length;return ' '+i.raw+' imóveis ('+Math.round(i.raw/tot*100)+'%)';}}}}
+    }
+  });
+  document.getElementById('alug-status-legend').innerHTML=
+    [['Normal','#2E7D32',sc.Normal],['Atenção','#D4820A',sc['Atenção']],['Crítico','#C0392B',sc['Crítico']]].map(function(x){
+      return '<div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;">'
+        +'<div style="width:10px;height:10px;border-radius:2px;background:'+x[1]+';flex-shrink:0;"></div>'
+        +'<span style="font-size:10px;color:var(--gm);flex:1;">'+x[0]+'</span>'
+        +'<span style="font-size:11px;font-weight:700;color:var(--g);">'+x[2]+'</span>'
+        +'</div>';
+    }).join('');
+}
+
+function renderAlugTable(filter){
+  var data=filter==='late'?ALUG_IMOVEIS.filter(function(im){return im.sit==='Crítico';}):ALUG_IMOVEIS;
+  document.getElementById('table-label').textContent=filter==='late'?'Imóveis Críticos':'Imóveis Anunciados';
+  var thead=document.querySelector('#tc-ativos table thead tr');
+  if(thead)thead.innerHTML='<th>Código</th><th>Endereço</th><th>Tipo</th><th>Valor</th><th>Fase</th><th>Responsável</th><th style="text-align:center;">Dias</th><th style="text-align:center;">Leads</th><th>Situação</th>';
+  document.getElementById('p-tbody').innerHTML=data.map(function(im){
+    var sitCls=im.sit==='Normal'?'bg':im.sit==='Atenção'?'ba':'br';
+    var daysBg=im.sit==='Normal'?'#E8F5E9':im.sit==='Atenção'?'#FFF3E0':'#FDECEA';
+    var daysCol=im.sit==='Normal'?'#2E7D32':im.sit==='Atenção'?'#D4820A':'#C0392B';
+    var faseCls=im.fase==='Em negociação'?'bb':im.fase==='Aguardando vistoria'?'ba':'bz';
+    return '<tr>'
+      +'<td class="tn">'+im.cod+'</td>'
+      +'<td style="font-size:11px;color:var(--gm);">'+im.end+'</td>'
+      +'<td>'+bx('bb',im.tipo)+'</td>'
+      +'<td style="font-weight:600;color:var(--g);white-space:nowrap;">'+im.val+'</td>'
+      +'<td>'+bx(faseCls,im.fase)+'</td>'
+      +'<td style="color:var(--gm);">'+im.resp+'</td>'
+      +'<td style="text-align:center;"><span class="days-badge" style="background:'+daysBg+';color:'+daysCol+';">'+im.dias+'</span></td>'
+      +'<td style="text-align:center;font-weight:700;color:var(--az);">'+im.leads+'</td>'
+      +'<td>'+bx(sitCls,im.sit)+'</td>'
+      +'</tr>';
+  }).join('');
+}
 function showProcess(p){
   curProc=p;curYear=2026;
+  var isAlug=p.key==='alug_gest';
+  document.getElementById('alug-extra').style.display=isAlug?'block':'none';
   document.getElementById('p-title').textContent=p.name;
-  document.getElementById('p-sub').textContent=p.active+' cards ativos  '+p.late+' vencidos';
+  document.getElementById('p-sub').textContent=isAlug?'31 imóveis ativos  7 vencidos':p.active+' cards ativos  '+p.late+' vencidos';
   document.getElementById('p-bc').textContent=p.name;
   document.getElementById('p-active').textContent=p.active;
   document.getElementById('p-late').textContent=p.late;
@@ -892,8 +1074,13 @@ function showProcess(p){
   }
   ['pf-all','pf-late','pf-pct','pf-hist'].forEach(function(id){document.getElementById(id).classList.remove('sel');});
   switchTab('ativos');renderProcessTable('all');showScreen('s-process');
+  if(isAlug){setTimeout(function(){buildAlugPage();},80);}
 }
 function renderProcessTable(filter){
+  if(curProc&&curProc.key==='alug_gest'){renderAlugTable(filter);return;}
+  // Restaurar cabeçalhos padrão
+  var thead=document.querySelector('#tc-ativos table thead tr');
+  if(thead)thead.innerHTML='<th>Título</th><th>Fase</th><th>Responsável</th><th>Situação</th>';
   var cards=curProc&&curProc.key==='efetivacao'?CCARDS:[{t:'Dados disponíveis após integração real com Pipefy',ph:'—',r:'—',l:false}];
   var filtered=filter==='late'?cards.filter(function(c){return c.l;}):cards;
   document.getElementById('table-label').textContent=filter==='late'?'Cards vencidos':'Cards ativos';

@@ -211,7 +211,7 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--cr);}
   <div class="card" id="agenda-card">
     <div class="ch">
       <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agenda</div>
-      <span class="bx bz">13/05 · Qua</span>
+      <span class="bx bz" id="agenda-date"></span>
     </div>
     <div class="agl">
       <div class="age"><div class="agd done"></div><div class="agt">09:00<br>10:00</div><div><div class="agn done">Reunião 1:1</div><div class="ags">Agenda da Empresa</div></div></div>
@@ -240,7 +240,7 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--cr);}
   <div class="card">
     <div class="ch">
       <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>Construção</div>
-      <span class="bx bz">Processos Pipefy</span>
+      <span class="bx bz">Processos</span>
     </div>
     <div class="csi">
       <div class="pw">
@@ -257,7 +257,7 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--cr);}
   <div class="card">
     <div class="ch">
       <div class="ct"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Operação</div>
-      <span class="bx bz">Tarefas Notion</span>
+      <span class="bx bz">Tarefas</span>
     </div>
     <div class="opm">
       <div class="om"><div class="ol">Total</div><div class="ov" id="op-total">103</div></div>
@@ -1358,6 +1358,12 @@ function updateClock(){
 }
 updateClock();
 setInterval(updateClock,60000);
+(function(){
+  var DAYS_SHORT=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  var n=new Date();
+  var el=document.getElementById('agenda-date');
+  if(el) el.textContent=String(n.getDate()).padStart(2,'0')+'/'+String(n.getMonth()+1).padStart(2,'0')+' · '+DAYS_SHORT[n.getDay()];
+})();
 
 // ═══════════════════════════════════════════════════════
 // TELA GESTÃO DE CAPTAÇÃO
